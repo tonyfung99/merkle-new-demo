@@ -1,12 +1,16 @@
 import React from 'react';
-import { HashRouter, Route, Switch } from 'react-router-dom';
+import { HashRouter, Route, Routes } from 'react-router-dom';
 
-const BasicRoute = () => (
-	<HashRouter>	
-		<Switch>
-			<Route></Route>
-		</Switch>
-	</HashRouter>
-);
+function BasicRoute() {
+  return (
+    <HashRouter>
+      <Routes>
+        <Route path="/" element={<Layout />}>
+          <Route path="/front" element={<Front />} />
+        </Route>
+      </Routes>
+    </HashRouter>
+  );
+}
 
 export default BasicRoute;
