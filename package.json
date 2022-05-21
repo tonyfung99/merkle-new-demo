@@ -1,56 +1,26 @@
 {
-  "name": "merklenews_frontend",
-  "version": "0.1.0",
-  "description": "",
-  "main": "index.js",
+  "name": "merkle-news",
+  "author": "@MerkleNews",
+  "license": "MIT",
+  "version": "1.0.0",
+  "private": true,
   "scripts": {
-    "start": "webpack-dev-server --config config/webpack.dev.config.js",
-    "build": "webpack --config config/webpack.prod.config.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "build": "turbo run build",
+    "dev": "turbo run dev --parallel",
+    "lint": "turbo run lint",
+    "test": "turbo run test",
+    "test:force": "turbo run test --force"
   },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/MerkleNews/MerkleNews_frontend.git"
-  },
-  "author": "Heacsing",
-  "license": "ISC",
-  "dependencies": {
-    "@emotion/react": "^11.9.0",
-    "@emotion/styled": "^11.8.1",
-    "@mui/material": "^5.6.4",
-    "i18next": "^21.6.16",
-    "i18next-browser-languagedetector": "^6.1.4",
-    "react": "^17.0.2",
-    "react-dom": "^17.0.2",
-    "react-i18next": "^11.16.7",
-    "react-router-dom": "^6.3.0"
-  },
+  "workspaces": [
+    "packages/*",
+    "apps/*"
+  ],
   "devDependencies": {
-    "@babel/cli": "^7.16.8",
-    "@babel/core": "^7.16.10",
-    "@babel/polyfill": "^7.12.1",
-    "@babel/preset-env": "^7.16.11",
-    "@babel/preset-react": "^7.16.7",
-    "babel-loader": "^8.2.3",
-    "css-loader": "^6.7.1",
-    "eslint": "^8.14.0",
-    "eslint-config-airbnb": "^19.0.4",
-    "eslint-plugin-import": "^2.26.0",
-    "eslint-plugin-jsx-a11y": "^6.5.1",
-    "eslint-plugin-react": "^7.29.4",
-    "eslint-plugin-react-hooks": "^4.5.0",
-    "file-loader": "^6.2.0",
-    "html-webpack-plugin": "^5.5.0",
-    "mini-css-extract-plugin": "^2.5.2",
-    "prop-types": "^15.8.1",
-    "style-loader": "^3.3.1",
-    "webpack": "^5.66.0",
-    "webpack-cli": "^4.9.1",
-    "webpack-dev-server": "^4.7.3",
-    "webpack-merge": "^5.8.0"
+    "turbo": "^1.1.6"
   },
-  "bugs": {
-    "url": "https://github.com/MerkleNews/MerkleNews_frontend/issues"
+  "engines": {
+    "npm": ">=7.0.0",
+    "node": ">=14.0.0"
   },
-  "homepage": "https://github.com/MerkleNews/MerkleNews_frontend#readme"
+  "packageManager": "npm@8.3.1"
 }
