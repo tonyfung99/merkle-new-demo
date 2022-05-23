@@ -1,26 +1,27 @@
 {
-  "name": "merkle-news",
-  "author": "@MerkleNews",
-  "license": "MIT",
+  "name": "@merkle-news/monorepo",
   "version": "1.0.0",
+  "keywords": [
+    "ethereum",
+    "react",
+    "workspaces",
+    "yarn"
+  ],
   "private": true,
   "scripts": {
-    "build": "turbo run build",
-    "dev": "turbo run dev --parallel",
-    "lint": "turbo run lint",
-    "test": "turbo run test",
-    "test:force": "turbo run test --force"
+    "subgraph:auth": "yarn workspace @merkle-news/subgraph auth",
+    "subgraph:codegen": "yarn workspace @merkle-news/subgraph codegen",
+    "subgraph:build": "yarn workspace @merkle-news/subgraph build",
+    "subgraph:deploy": "yarn workspace @merkle-news/subgraph deploy",
+    "react-app:build": "yarn workspace @merkle-news/react-app build",
+    "react-app:eject": "yarn workspace @merkle-news/react-app eject",
+    "react-app:ipfs": "yarn workspace @merkle-news/react-app ipfs",
+    "react-app:start": "yarn workspace @merkle-news/react-app start",
+    "react-app:test": "yarn workspace @merkle-news/react-app test"
   },
-  "workspaces": [
-    "packages/*",
-    "apps/*"
-  ],
-  "devDependencies": {
-    "turbo": "^1.1.6"
-  },
-  "engines": {
-    "npm": ">=7.0.0",
-    "node": ">=14.0.0"
-  },
-  "packageManager": "npm@8.3.1"
+  "workspaces": {
+    "packages": [
+      "packages/*"
+    ]
+  }
 }
