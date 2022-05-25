@@ -40,10 +40,12 @@ export default function AppFrame({ children }: { children: React.Component }) {
     return (
         <ThemeProvider>
             <AppHeader />
+            <Box sx={{ flex: 1, bgcolor: (theme) => (theme.palette.mode === 'dark' ? 'primaryDark.700' : 'grey.50'), overflow: 'auto' }}>
+                <Container sx={{ flex: 1 }}>
+                    {children}
+                </Container>
 
-            <Container sx={{ flex: 1, bgcolor: (theme) => (theme.palette.mode === 'dark' ? 'primaryDark.700' : 'grey.50'), overflow: 'auto' }}>
-                {children}
-            </Container>
+            </Box>
 
         </ThemeProvider >
     );

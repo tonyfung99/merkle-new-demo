@@ -16,7 +16,7 @@ import { useChangeTheme } from '../theme/ThemeContext';
 import { AppBar, Link, Toolbar } from '@mui/material';
 import Image from '../components/Image';
 
-import LogoPath from '../assets/icon.jpg';
+import LogoPath from '../assets/icon.png';
 import logo from "./ass/ethereumLogo.png";
 import WalletButton from '../components/WalletButton';
 
@@ -47,10 +47,6 @@ export default function AppHeader() {
     };
 
     return (
-
-
-
-        // <Header sx={{ margin: 0 }}>
 
         < Toolbar sx={{
             bgcolor: (theme) => (theme.palette.mode === 'dark' ? 'primaryDark.800' : 'grey.50')
