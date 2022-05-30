@@ -8,11 +8,20 @@ import logo from "./ethereumLogo.png";
 import { addresses, abis } from "@merkle-news/contracts";
 import Button from "@mui/material/Button";
 
+import Config from '../config'
+import { useGenerateKey, useRequest } from "../utils/hooks";
+
+
 function WalletButton() {
     const [rendered, setRendered] = useState("");
 
     const ens = useLookupAddress();
-    const { account, activateBrowserWallet, deactivate, error } = useEthers();
+    const { account, activateBrowserWallet, deactivate, error, library } = useEthers();
+
+
+    console.log('account', account)
+    // const keyPairs = useGenerateKey()
+
 
     useEffect(() => {
         if (ens) {
@@ -30,6 +39,8 @@ function WalletButton() {
         }
     }, [error]);
 
+    const { data, error: apiError, loaded } = useRequest('api/register', {})
+
     return (
         <Button
             onClick={() => {
@@ -37,6 +48,7 @@ function WalletButton() {
                     activateBrowserWallet();
                 } else {
                     deactivate();
+                    console.log('deactviate clicked')
                 }
             }}
         >

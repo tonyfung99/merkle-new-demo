@@ -22,6 +22,15 @@ import CardActions from '@mui/material/CardActions';
 import CardContent from '@mui/material/CardContent';
 import Button from '@mui/material/Button';
 
+import Unidata from "unidata.js"
+import { addresses, abis } from "@merkle-news/contracts";
+import { shortenAddress, useCall, useEthers, useLookupAddress } from "@usedapp/core";
+import NFTCard from '../../components/NFTCard';
+
+import { Grid } from '@mui/material';
+import LanguageIcon from '@mui/icons-material/Language';
+
+import PermIdentityIcon from '@mui/icons-material/PermIdentity';
 
 const TimeLineNode = ({ children }: { children: any }) => {
 
@@ -51,7 +60,7 @@ const TimeLineNode = ({ children }: { children: any }) => {
 }
 
 const ContributionCard = ({ title, subTitle }) => {
-    return <Card sx={{ width: 200 }}>
+    return <Card sx={{ width: 200, height: 140, margin: 1 }}>
         <CardContent>
             <Typography sx={{ fontSize: 14 }} color="text.secondary" gutterBottom>
                 {title}
@@ -67,58 +76,158 @@ const ContributionCard = ({ title, subTitle }) => {
 
 }
 
+const TimeLinePart = () => (<Timeline sx={{ width: 500 }}>
+    <TimeLineNode><PostCard /></TimeLineNode>
+    <TimeLineNode><PostCard /></TimeLineNode>
+    <TimeLineNode><PostCard /></TimeLineNode>
+</Timeline>)
+
+
 const Profile = (params: any) => {
+
+    const ens = useLookupAddress();
+    const { account, activateBrowserWallet, deactivate, error, library } = useEthers();
+
+    const [nfts, setNfts] = React.useState([])
+
+    React.useEffect(() => {
+
+        const unidata = new Unidata()
+
+        unidata.assets.get({
+            identity: '0x7b47640ed97Cc08Aa188Ae091eFAb2CF3eF48469',
+            source: 'Ethereum NFT'
+        }).then(res => {
+            console.log('nft response:')
+            console.log(res)
+            setNfts(res?.list)
+        }).catch(err => {
+            console.log('nft eror', err)
+        })
+
+
+        unidata.notes.get({
+            identity: '0x7b47640ed97Cc08Aa188Ae091eFAb2CF3eF48469',
+            source: 'Mirror Entry',
+
+        }).then(res => {
+            console.log('notes response:')
+            console.log(res)
+            setNfts(res?.list)
+        }).catch(err => {
+            console.log('notes eror', err)
+        })
+
+        unidata.profiles.get({
+            source: 'ENS',
+            identity: '0x7b47640ed97Cc08Aa188Ae091eFAb2CF3eF48469'
+        }).then(res => {
+            console.log('profile response:')
+            console.log(res)
+            setNfts(res?.list)
+        }).catch(err => {
+            console.log('profile eror', err)
+        })
+
+
+
+    }, [])
+
+    const [networks, setNetworks] = React.useState([])
+
+    React.useEffect(() => {
+        const _networks = nfts.reduce((pre, cur, _, arr) => {
+            if (!pre.includes(cur.metadata.network)) {
+                pre.push(cur.metadata.network)
+                return pre
+            }
+            return pre
+        }, [])
+
+        setNetworks(_networks)
+    }, [nfts])
+
     return (
         <Box>
             <Container>
                 <Paper variant='outlined' sx={{ margin: 6 }}>
-
-                    <Stack direction={'row'} justifyContent='space-between' margin={4}>
-                        <Stack direction="row" spacing={4}>
-
+                    <Grid container spacing={1} justifyContent='space-between' padding={2}>
+                        <Grid sx={{
+                            display: 'flex',
+                            flexDirection: 'row',
+                            padding: 3,
+                            alignItems: 'center',
+                        }} item xs={12} md={8} spacing={2}>
                             <Avatar
                                 alt="Remy Sharp"
                                 src="/public/profile-1.jpeg"
-                                sx={{ width: 120, height: 120 }}
+                                sx={{ width: 120, height: 120, marginRight: 4 }}
                             />
 
-                            <Stack direction={'column'} spacing={1} alignContent={'start'}>
+                            <Stack direction={'column'} spacing={1} alignContent={'start'} alignItems='start'>
 
                                 <Typography variant="h3" color="text.secondary" align='center'>
-                                    User Name
+                                    {ens}
                                 </Typography>
-                                <Typography variant="h6" color="text.secondary" align='center'>
-                                    0xAddress
+                                <Typography variant="body2" color="text.secondary" align='center'>
+                                    {account}
                                 </Typography>
-                                <Stack direction="row" spacing={2}>
 
-                                    <Chip label="web3" variant="outlined" />
-                                    <Chip label="data science" variant="outlined" />
+                                <Stack direction="row" spacing={1} alignItems={'center'}>
+                                    <PermIdentityIcon />
+                                    <Chip label="Collector" variant="outlined" />
+                                    <Chip label="Author" variant="outlined" />
+                                </Stack>
+                                <Stack direction="row" spacing={1} alignItems={'center'}>
+                                    <LanguageIcon />
+
+                                    {networks.map(n => <Chip label={n} />)}
+
                                 </Stack>
                             </Stack>
 
-                        </Stack>
-                        <Stack direction="row" spacing={4}>
+                        </Grid>
+                        <Grid item xs={12} md={4} sx={{
+                            display: 'flex',
+                            flexDirection: 'row'
+                        }} >
 
-                            <ContributionCard title='Post written' subTitle={'40'} />
-                            <ContributionCard title='Vote' subTitle={'20'} />
-                        </Stack>
+                            <ContributionCard title='Articles' subTitle={'40'} />
+                            <ContributionCard title='NFTs' subTitle={nfts.length} />
+                        </Grid>
+                    </Grid>
 
-                    </Stack>
                 </Paper>
 
-                <Stack direction={'row'} justifyContent='space-between' margin={2} overflow='auto'>
-                    <Box>
-                        <PostCard />
-                        <PostCard />
-                        <PostCard />
-                        <PostCard />
-                    </Box>
-                    <Timeline sx={{ width: 500 }}>
-                        <TimeLineNode><PostCard /></TimeLineNode>
-                        <TimeLineNode><PostCard /></TimeLineNode>
-                        <TimeLineNode><PostCard /></TimeLineNode>
-                    </Timeline>
+                <Stack direction={'column'} overflow='auto'>
+
+
+                    <Typography variant="h6" component="span" color="text.secondary">
+                        Articles
+                    </Typography>
+
+                    <Grid container spacing={1}>
+
+                        {/* {notes.map((n, idx) => <Grid item xs={6} md={6}>
+                            <NFTCard asset={n} key={idx} />
+                        </Grid>
+                        )} */}
+                    </Grid>
+
+                    <Typography variant="h6" component="span" color="text.secondary">
+                        NFT Collections
+                    </Typography>
+
+                    <Grid container spacing={1}>
+
+                        {nfts.map((n, idx) => <Grid item xs={12} sm={6} md={4}>
+                            <NFTCard asset={n} key={idx} />
+                        </Grid>
+                        )}
+                    </Grid>
+
+
+
                 </Stack>
             </Container>
         </Box>

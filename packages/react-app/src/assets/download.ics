@@ -1,0 +1,11 @@
+BEGIN:VCALENDAR
+VERSION:2.0
+BEGIN:VEVENT
+URL:https://be.synxis.com/confirm?adult=2&arrive=2022-06-26&chain=21125&child=0&currency=HKD&depart=2022-06-27&hotel=3631&level=hotel&locale=en-US&rooms=1&sbe_pl=1&sbe_rc=ZmMxYWEyY2YtY2EzYi00ZDBkLTk3MGItNzQwYmQyOTQ3NWY2
+DTSTART:20220626T070000Z
+DTEND:20220627T040000Z
+SUMMARY:Ocean View Deluxe room - Auberge Discovery Bay Hong Kong
+DESCRIPTION:We’re looking forward to your stay with us at Auberge Discovery Bay Hong Kong! Please come to the front desk when you arrive. Check-in time is any time after 3:00 PM. For your convenience, your confirmation number is 3631SE217252. If you have any questions or concerns, please call us at +852-2295-8288 or email us at enquiry@aubergediscoverybay.com.
+LOCATION:
+END:VEVENT
+END:VCALENDAR
