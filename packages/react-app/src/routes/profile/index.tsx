@@ -91,11 +91,11 @@ const Profile = (params: any) => {
     const [nfts, setNfts] = React.useState([])
 
     React.useEffect(() => {
-
+        if (!account) return
         const unidata = new Unidata()
 
         unidata.assets.get({
-            identity: '0x7b47640ed97Cc08Aa188Ae091eFAb2CF3eF48469',
+            identity: account,
             source: 'Ethereum NFT'
         }).then(res => {
             console.log('nft response:')
@@ -107,7 +107,7 @@ const Profile = (params: any) => {
 
 
         unidata.notes.get({
-            identity: '0x7b47640ed97Cc08Aa188Ae091eFAb2CF3eF48469',
+            identity: account,
             source: 'Mirror Entry',
 
         }).then(res => {
@@ -120,7 +120,7 @@ const Profile = (params: any) => {
 
         unidata.profiles.get({
             source: 'ENS',
-            identity: '0x7b47640ed97Cc08Aa188Ae091eFAb2CF3eF48469'
+            identity: account
         }).then(res => {
             console.log('profile response:')
             console.log(res)
@@ -131,7 +131,7 @@ const Profile = (params: any) => {
 
 
 
-    }, [])
+    }, [account])
 
     const [networks, setNetworks] = React.useState([])
 

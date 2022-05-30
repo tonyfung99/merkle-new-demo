@@ -68,11 +68,14 @@ function NFTCard({ asset }: { asset: NFTAsset }) {
             }}>
                 {asset?.items?.[0]?.address ?
                     <CardMedia
+                        autoPlay={true}
+                        muted={true}
+                        loop={true}
                         component={isImage ? "img" : "video"}
                         height="240"
                         image={asset?.items?.[0]?.address}
                         alt={asset.description}
-                    /> : <Box height={240} width={345} bgcolor='white' ></Box>}
+                    /> : <Box height={240} width={345} bgcolor='#6F7E8C' ></Box>}
                 <CardContent sx={{
                     display: 'flex',
                     flexDirection: 'column',
