@@ -5,7 +5,10 @@ import PostCard from '../../components/PostCard';
 // import { makeStyles } from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import Unidata from "unidata.js"
-import { createPost, useFeeds } from '../../utils/hooks';
+import { createPost } from '../../utils/hooks';
+import { buildLink, MediaNote } from '../../utils/schema';
+import FeedFilterButton from '../../components/FeedFilterButton'
+import axios from 'axios'
 
 const useStyles: () => any = makeStyles({
     textAreaWithStyle: {
@@ -45,11 +48,15 @@ function MaxHeightTextarea({ value, onChange }) {
     );
 }
 
+const HARDCODED = ['0x7b47640ed97Cc08Aa188Ae091eFAb2CF3eF48469',
+    '0x5AcABC3222A7b74884bEC8efe28A7A69A7920818',
+    '0xF1650d925DFfC086aC720ca976DD01542A7f528d',
+    '0xE43a21Ee76b591fe6E479da8a8a388FCfea6F77F']
+
 const Feeds = (params: any) => {
 
     const [userPostInfos, setUserPostInfos] = React.useState([]);
     {/* <Image src={logo} alt="ethereum-logo" /> */ }
-    const feeds = useFeeds(['0xd8da6bf26964af9d7eed9e03e53415d37aa96045'], ['NFT', 'Mirror Entry']) || []
 
     const [valueOfInput, setValueOfInput] = React.useState('');
 
@@ -62,15 +69,55 @@ const Feeds = (params: any) => {
         setValueOfInput('')
     }
 
+    const [filterOption, setFilterOption] = React.useState<'all' | 'Mirror Entry' | 'NFT'>('all');
+
+    const [feeds, setFeeds] = React.useState<MediaNote[]>([])
+    const [addresses, setAddresses] = React.useState(HARDCODED)
+
+    React.useEffect(() => {
+        const tags = filterOption === 'all' ? ['Mirror Entry', 'NFT'] : [filterOption]
+
+        if (!addresses) {
+            return
+        }
+
+        const body = {
+            addresses: addresses.map(addr => buildLink(addr)),
+            tags: tags
+        }
+
+        const route = `https://pregod.rss3.dev/v0.4.0/notes`
+        axios.post(route, body).then(res => {
+            console.log(res.data)
+            setFeeds(res.data.list)
+        })
+    }, [addresses, filterOption])
+
+
+
+    const filterChange = (
+        event: React.MouseEvent<HTMLElement>,
+        newAlignment: 'all' | 'Mirror Entry' | 'NFT',
+    ) => {
+        setFilterOption(newAlignment);
+    };
+
     return (
         <Box overflow={'hidden'}>
 
-            <Paper sx={{ margin: 4, display: 'flex' }}>
+            {/* <Paper sx={{ margin: 4, display: 'flex' }}>
                 <MaxHeightTextarea value={valueOfInput} onChange={onInputChange} />
 
                 <Button title='Post' onClick={() => onPost()}>Post</Button>
-            </Paper>
-
+            </Paper> */}
+            <Box sx={{
+                display: 'flex',
+                flexDirection: 'row',
+                justifyContent: 'end',
+                paddingRight: 6
+            }}>
+                <FeedFilterButton filterOption={filterOption} handleChange={filterChange} />
+            </Box>
             <Stack overflow={'auto'}>
                 {feeds?.map((f, idx) => <PostCard feed={f} key={idx} />)}
             </Stack>

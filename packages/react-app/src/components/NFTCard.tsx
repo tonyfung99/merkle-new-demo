@@ -17,6 +17,7 @@ import MoreVertIcon from '@mui/icons-material/MoreVert';
 import { Box, Chip, Paper } from '@mui/material';
 
 import { CardActionArea } from '@mui/material';
+import { MediaNote, NFTMeta, MIMEContent } from '../utils/schema';
 interface ExpandMoreProps extends IconButtonProps {
     expand: boolean;
 }
@@ -32,31 +33,19 @@ const ExpandMore = styled((props: ExpandMoreProps) => {
     }),
 }));
 
-interface Metadata {
-    collection_address: string,
-    network: string,
-}
 
-interface AssetItem {
-    address: string,
-    mime_type: string
-}
-interface NFTAsset {
-    description: string,
-    items?: AssetItem[]
-    metadata: Metadata,
-    tags: (string | 'NFT')[]
-}
-
-function NFTCard({ asset }: { asset: NFTAsset }) {
+function NFTCard({ note }: { note: MediaNote }) {
     const [expanded, setExpanded] = React.useState(false);
 
     const handleExpandClick = () => {
         setExpanded(!expanded);
     };
 
+    const nftMeta: NFTMeta = (note?.metadata as NFTMeta)
+    const media_url = note?.attachments?.find(att => att.type === 'preview')?.address
+    const isImage = ['jpg', 'png', 'gif', 'svg'].includes(media_url?.split('.')?.pop());
 
-    const isImage = ['jpg', 'png', 'gif'].includes(asset?.items?.[0]?.address.split('.').pop());
+    console.log('media', note?.attachments?.find(att => att.type === 'preview'), media_url)
 
     return (
         <Card sx={{ maxWidth: 345, height: 400, margin: 4 }} >
@@ -66,15 +55,15 @@ function NFTCard({ asset }: { asset: NFTAsset }) {
                 alignContent: 'flex-start',
                 alignItems: 'start'
             }}>
-                {asset?.items?.[0]?.address ?
+                {media_url ?
                     <CardMedia
                         autoPlay={true}
                         muted={true}
                         loop={true}
                         component={isImage ? "img" : "video"}
                         height="240"
-                        image={asset?.items?.[0]?.address}
-                        alt={asset.description}
+                        image={media_url}
+                        alt={note.title}
                     /> : <Box height={240} width={345} bgcolor='#6F7E8C' ></Box>}
                 <CardContent sx={{
                     display: 'flex',
@@ -85,14 +74,13 @@ function NFTCard({ asset }: { asset: NFTAsset }) {
                     overflow: 'hidden'
                 }}>
                     <Typography gutterBottom variant="body2" color="text.secondary" sx={{ flex: 1, overflow: 'hidden' }}>
-                        {asset.description}
+                        {note.title}
                     </Typography>
-                    {/* <Typography variant="body2" color="text.secondary">
-                        Lizards are a widespread group of squamate reptiles, with over 6,000
-                        species, ranging across all continents except Antarctica
-                    </Typography> */}
+                    <Typography variant="body2" color="text.secondary" sx={{ height: 60, overflow: 'hidden' }}>
+                        {note.summary}
+                    </Typography>
                     <Box >
-                        <Chip label={asset?.metadata?.network} />
+                        <Chip label={note?.metadata?.network} />
                     </Box>
                 </CardContent>
             </CardActionArea>

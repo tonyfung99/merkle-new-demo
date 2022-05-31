@@ -77,10 +77,13 @@ export interface EventNote {
 export interface MIMEContent {
     type: string,
     content: string,
+    address?: string,
     mime_type: string
 }
 
-export interface ArticleNote extends EventNote {
+
+// NFT / Mirror
+export interface MediaNote extends EventNote {
     title: string,
     summary: string,
     attachments: MIMEContent[]

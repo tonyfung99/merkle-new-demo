@@ -31,7 +31,7 @@ import { Grid } from '@mui/material';
 import LanguageIcon from '@mui/icons-material/Language';
 
 import PermIdentityIcon from '@mui/icons-material/PermIdentity';
-import { useAvatar, useProfileFeed, useRss3 } from '../../utils/hooks';
+import { useAvatar, useProfileFeed } from '../../utils/hooks';
 
 import Tab from '@mui/material/Tab';
 import TabContext from '@mui/lab/TabContext';
@@ -100,14 +100,13 @@ const Profile = (params: any) => {
     const { account, activateBrowserWallet, deactivate, error, library } = useEthers();
 
 
-    const [nfts, setNfts] = React.useState([])
 
     const avatar = useAvatar(account)
 
 
 
     const feeds = useProfileFeed(account, 'Mirror Entry') ?? []
-    // const nfts = useProfileFeed(account, 'NFT') ?? []
+    const nfts = useProfileFeed(account, 'NFT') ?? []
 
 
 
@@ -208,7 +207,7 @@ const Profile = (params: any) => {
                             <Grid container spacing={1}>
 
                                 {nfts.map((n, idx) => <Grid item xs={12} sm={6} md={4}>
-                                    <NFTCard asset={n} key={idx} />
+                                    <NFTCard note={n} key={idx} />
                                 </Grid>
                                 )}
                             </Grid>

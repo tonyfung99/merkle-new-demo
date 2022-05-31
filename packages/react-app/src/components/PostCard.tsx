@@ -18,7 +18,9 @@ import { Box, Link, Chip, Stack } from '@mui/material';
 
 import { useEthers, shortenAddress, useLookupAddress } from "@usedapp/core";
 import { useAvatar } from '../utils/hooks';
-import { ArticleNote, EventNote, NFTMeta, parseLink } from '../utils/schema';
+import { MediaNote, NFTMeta, parseLink } from '../utils/schema';
+import ReactMarkdown from 'react-markdown'
+import NFTCard from './NFTCard';
 
 interface FeedTargetAction {
     type: 'update' | 'add'
@@ -57,7 +59,7 @@ const ExpandMore = styled((props: ExpandMoreProps) => {
     }),
 }));
 
-function PostCard({ feed }: { feed: EventNote }) {
+function PostCard({ feed }: { feed: MediaNote }) {
     const [expanded, setExpanded] = React.useState(false);
 
     const handleExpandClick = () => {
@@ -75,31 +77,30 @@ function PostCard({ feed }: { feed: EventNote }) {
     const isNFT = tag.includes('NFT')
     const isArticle = tag.includes('Mirror Entry')
 
-    let summary = ''
-    if (isNFT) {
-        summary = (feed?.metadata as NFTMeta).collection_name
-    } else if (isArticle) {
-        summary = (feed as ArticleNote).summary
-    }
+    let summary = feed?.summary
+    // if (isNFT) {
+    //     summary = (feed?.metadata as NFTMeta).collection_name
+    // } else if (isArticle) {
+    //     summary = (feed as ArticleNote).summary
+    // }
 
-    let title = (feed as ArticleNote).title || ''
+    let title = feed?.title || ''
     const { library } = useEthers();
 
 
     const { identifier: userAddr } = parseLink(feed.authors?.[0]) || {}
 
-    const avatar = useAvatar(userAddr)
+    const avatar = null
     const [displayName, setDisplayName] = React.useState(userAddr)
 
-    React.useEffect(() => {
 
-
-        library.lookupAddress(userAddr).then(res => {
-            setDisplayName(res)
-        })
-
-
-    }, [userAddr])
+    // React.useEffect(() => {
+    //     library.lookupAddress(userAddr).then(res => {
+    //         if (res) {
+    //             setDisplayName(res)
+    //         }
+    //     }).catch(err => console.log('cannot lookup', err))
+    // }, [userAddr])
 
     // get detail
 
@@ -108,7 +109,7 @@ function PostCard({ feed }: { feed: EventNote }) {
             <CardHeader
                 avatar={
                     <Avatar sx={{ bgcolor: red[500] }} aria-label={feed?.authors?.[0]} src={avatar}>
-                        U
+                        {displayName?.substring(0, 3)}
                     </Avatar>
                 }
                 title={displayName}
@@ -120,9 +121,17 @@ function PostCard({ feed }: { feed: EventNote }) {
                 <Typography variant='h3'>
                     {title}
                 </Typography>
-                <Typography variant='h5'>
-                    {summary}
-                </Typography>
+                {isArticle ?
+                    (<ReactMarkdown>
+                        {summary}
+                    </ReactMarkdown>) :
+                    <Typography variant='body1'>
+                        {summary}
+
+                        <NFTCard note={feed} />
+                    </Typography>
+                }
+
             </CardContent>
             <Box margin={2}>
                 {assetType && <Chip label={assetType} />}
