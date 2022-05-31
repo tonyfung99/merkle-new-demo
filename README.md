@@ -1,3 +1,10 @@
+# Quick Note
+
+- Please connect wallet before going to profile page 
+- smart contract part is not ready 
+
+
+
 This project was bootstrapped with [Create Eth App](https://github.com/paulrberg/create-eth-app).
 
 ## Project Structure
