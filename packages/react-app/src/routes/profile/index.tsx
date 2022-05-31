@@ -8,7 +8,7 @@ import TimelineContent from '@mui/lab/TimelineContent';
 import TimelineDot from '@mui/lab/TimelineDot';
 import Avatar from '@mui/material/Avatar';
 import Stack from '@mui/material/Stack';
-import { Box, Chip, Paper } from '@mui/material';
+import { Box, Chip, Paper, Badge } from '@mui/material';
 import PostCard from '../../components/PostCard';
 import TimelineOppositeContent from '@mui/lab/TimelineOppositeContent';
 
@@ -31,6 +31,15 @@ import { Grid } from '@mui/material';
 import LanguageIcon from '@mui/icons-material/Language';
 
 import PermIdentityIcon from '@mui/icons-material/PermIdentity';
+import { useAvatar, useProfileFeed, useRss3 } from '../../utils/hooks';
+
+import Tab from '@mui/material/Tab';
+import TabContext from '@mui/lab/TabContext';
+import TabList from '@mui/lab/TabList';
+import TabPanel from '@mui/lab/TabPanel';
+
+
+
 
 const TimeLineNode = ({ children }: { children: any }) => {
 
@@ -77,61 +86,30 @@ const ContributionCard = ({ title, subTitle }) => {
 }
 
 const TimeLinePart = () => (<Timeline sx={{ width: 500 }}>
-    <TimeLineNode><PostCard /></TimeLineNode>
-    <TimeLineNode><PostCard /></TimeLineNode>
-    <TimeLineNode><PostCard /></TimeLineNode>
+    <TimeLineNode><Box></Box></TimeLineNode>
+    <TimeLineNode><Box></Box></TimeLineNode>
+    <TimeLineNode><Box></Box></TimeLineNode>
+
 </Timeline>)
 
 
 const Profile = (params: any) => {
 
-    const ens = useLookupAddress();
+    // todo:  remove assuming current use 
+    const ens = useLookupAddress()
     const { account, activateBrowserWallet, deactivate, error, library } = useEthers();
+
 
     const [nfts, setNfts] = React.useState([])
 
-    React.useEffect(() => {
-        if (!account) return
-        const unidata = new Unidata()
-
-        unidata.assets.get({
-            identity: account,
-            source: 'Ethereum NFT'
-        }).then(res => {
-            console.log('nft response:')
-            console.log(res)
-            setNfts(res?.list)
-        }).catch(err => {
-            console.log('nft eror', err)
-        })
-
-
-        unidata.notes.get({
-            identity: account,
-            source: 'Mirror Entry',
-
-        }).then(res => {
-            console.log('notes response:')
-            console.log(res)
-            setNfts(res?.list)
-        }).catch(err => {
-            console.log('notes eror', err)
-        })
-
-        unidata.profiles.get({
-            source: 'ENS',
-            identity: account
-        }).then(res => {
-            console.log('profile response:')
-            console.log(res)
-            setNfts(res?.list)
-        }).catch(err => {
-            console.log('profile eror', err)
-        })
+    const avatar = useAvatar(account)
 
 
 
-    }, [account])
+    const feeds = useProfileFeed(account, 'Mirror Entry') ?? []
+    // const nfts = useProfileFeed(account, 'NFT') ?? []
+
+
 
     const [networks, setNetworks] = React.useState([])
 
@@ -147,6 +125,13 @@ const Profile = (params: any) => {
         setNetworks(_networks)
     }, [nfts])
 
+
+    const [tab, setTab] = React.useState('feed');
+
+    const handleChange = (event: React.SyntheticEvent, newValue: string) => {
+        setTab(newValue);
+    };
+
     return (
         <Box>
             <Container>
@@ -159,8 +144,8 @@ const Profile = (params: any) => {
                             alignItems: 'center',
                         }} item xs={12} md={8} spacing={2}>
                             <Avatar
-                                alt="Remy Sharp"
-                                src="/public/profile-1.jpeg"
+                                alt={ens || 'User'}
+                                src={avatar}
                                 sx={{ width: 120, height: 120, marginRight: 4 }}
                             />
 
@@ -178,12 +163,10 @@ const Profile = (params: any) => {
                                     <Chip label="Collector" variant="outlined" />
                                     <Chip label="Author" variant="outlined" />
                                 </Stack>
-                                <Stack direction="row" spacing={1} alignItems={'center'}>
+                                {/* <Stack direction="row" spacing={1} alignItems={'center'}>
                                     <LanguageIcon />
-
                                     {networks.map(n => <Chip label={n} />)}
-
-                                </Stack>
+                                </Stack> */}
                             </Stack>
 
                         </Grid>
@@ -192,7 +175,7 @@ const Profile = (params: any) => {
                             flexDirection: 'row'
                         }} >
 
-                            <ContributionCard title='Articles' subTitle={'40'} />
+                            <ContributionCard title='Articles' subTitle={feeds.length} />
                             <ContributionCard title='NFTs' subTitle={nfts.length} />
                         </Grid>
                     </Grid>
@@ -202,29 +185,36 @@ const Profile = (params: any) => {
                 <Stack direction={'column'} overflow='auto'>
 
 
-                    <Typography variant="h6" component="span" color="text.secondary">
-                        Articles
-                    </Typography>
+                    <TabContext value={tab}>
+                        <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
+                            <TabList onChange={handleChange} aria-label="Profile Section" variant='fullWidth'>
 
-                    <Grid container spacing={1}>
 
-                        {/* {notes.map((n, idx) => <Grid item xs={6} md={6}>
-                            <NFTCard asset={n} key={idx} />
-                        </Grid>
-                        )} */}
-                    </Grid>
+                                <Tab label={<Box >Articles<Chip sx={{ marginLeft: 1 }} label={feeds.length} /></Box>} value="feed" />
 
-                    <Typography variant="h6" component="span" color="text.secondary">
-                        NFT Collections
-                    </Typography>
+                                <Tab label={<Box >NFT Collections<Chip sx={{ marginLeft: 1 }} label={nfts.length} /></Box>} value="nft" />
 
-                    <Grid container spacing={1}>
+                            </TabList>
+                        </Box>
+                        <TabPanel value="feed">
+                            <Stack overflow={'auto'}>
+                                {feeds.map((f, idx) => <PostCard feed={f} key={idx} />)}
+                            </Stack>
 
-                        {nfts.map((n, idx) => <Grid item xs={12} sm={6} md={4}>
-                            <NFTCard asset={n} key={idx} />
-                        </Grid>
-                        )}
-                    </Grid>
+                        </TabPanel>
+                        <TabPanel value="nft">
+
+
+                            <Grid container spacing={1}>
+
+                                {nfts.map((n, idx) => <Grid item xs={12} sm={6} md={4}>
+                                    <NFTCard asset={n} key={idx} />
+                                </Grid>
+                                )}
+                            </Grid>
+
+                        </TabPanel>
+                    </TabContext>
 
 
 

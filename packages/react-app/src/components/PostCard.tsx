@@ -11,14 +11,40 @@ import IconButton, { IconButtonProps } from '@mui/material/IconButton';
 import Typography from '@mui/material/Typography';
 import { red } from '@mui/material/colors';
 import FavoriteIcon from '@mui/icons-material/Favorite';
-import ShareIcon from '@mui/icons-material/Share';
+import CommentIcon from '@mui/icons-material/AddComment';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
-import { Box, Link } from '@mui/material';
+import { Box, Link, Chip, Stack } from '@mui/material';
+
+import { useEthers, shortenAddress, useLookupAddress } from "@usedapp/core";
+import { useAvatar } from '../utils/hooks';
+import { ArticleNote, EventNote, NFTMeta, parseLink } from '../utils/schema';
+
+interface FeedTargetAction {
+    type: 'update' | 'add'
+    payload: string
+    proof: string
+}
+
+interface FeedTarget {
+    action: FeedTargetAction,
+    field: string
+}
+
+interface BasicFeed {
+    id: string,
+    date_created: string,
+    date_updated: string,
+    summary?: string,
+    target?: FeedTarget
+}
 
 interface ExpandMoreProps extends IconButtonProps {
     expand: boolean;
 }
+
+
+
 
 const ExpandMore = styled((props: ExpandMoreProps) => {
     const { expand, ...other } = props;
@@ -31,90 +57,76 @@ const ExpandMore = styled((props: ExpandMoreProps) => {
     }),
 }));
 
-function PostCard() {
+function PostCard({ feed }: { feed: EventNote }) {
     const [expanded, setExpanded] = React.useState(false);
 
     const handleExpandClick = () => {
         setExpanded(!expanded);
     };
 
+    // const meta = feed?.metadata?.
+    const tag = feed?.tags?.[0]
+
+    const network = tag.split('.')?.[0]
+    const assetType = tag
+
+    // const summary = feed?.summary || `I have ${feed?.target?.action?.type}ed a ${assetType} on ${network}`
+
+    const isNFT = tag.includes('NFT')
+    const isArticle = tag.includes('Mirror Entry')
+
+    let summary = ''
+    if (isNFT) {
+        summary = (feed?.metadata as NFTMeta).collection_name
+    } else if (isArticle) {
+        summary = (feed as ArticleNote).summary
+    }
+
+    let title = (feed as ArticleNote).title || ''
+    const { library } = useEthers();
+
+
+    const { identifier: userAddr } = parseLink(feed.authors?.[0]) || {}
+
+    const avatar = useAvatar(userAddr)
+    const [displayName, setDisplayName] = React.useState(userAddr)
+
+    React.useEffect(() => {
+
+
+        library.lookupAddress(userAddr).then(res => {
+            setDisplayName(res)
+        })
+
+
+    }, [userAddr])
+
+    // get detail
+
     return (
         <Card sx={{ flex: 1, margin: 4 }}>
             <CardHeader
                 avatar={
-                    <Avatar sx={{ bgcolor: red[500] }} aria-label="recipe">
-                        R
+                    <Avatar sx={{ bgcolor: red[500] }} aria-label={feed?.authors?.[0]} src={avatar}>
+                        U
                     </Avatar>
                 }
-                action={
-                    <IconButton aria-label="settings">
-                        <MoreVertIcon />
-                    </IconButton>
-                }
-                title="Shrimp and Chorizo Paella"
-                subheader="September 14, 2016"
+                title={displayName}
+                subheader={feed.date_updated}
             />
+
             <CardContent>
-                <Typography variant="body2" color="text.secondary">
-                    This impressive paella is a perfect party dish and a fun meal to cook
-                    together with your guests. Add 1 cup of frozen peas along with the mussels,
-                    if you like.
+
+                <Typography variant='h3'>
+                    {title}
                 </Typography>
-                <ExpandMore
-                    expand={expanded}
-                    onClick={handleExpandClick}
-                    aria-expanded={expanded}
-                    aria-label="show more"
-                >
-                    <ExpandMoreIcon />
-                </ExpandMore>
-
-                <Collapse in={expanded} timeout="auto" unmountOnExit>
-                    <CardContent>
-                        <Typography paragraph>Method:</Typography>
-                        <Typography paragraph>
-                            Heat 1/2 cup of the broth in a pot until simmering, add saffron and set
-                            aside for 10 minutes.
-                        </Typography>
-                        <Typography paragraph>
-                            Heat oil in a (14- to 16-inch) paella pan or a large, deep skillet over
-                            medium-high heat. Add chicken, shrimp and chorizo, and cook, stirring
-                            occasionally until lightly browned, 6 to 8 minutes. Transfer shrimp to a
-                            large plate and set aside, leaving chicken and chorizo in the pan. Add
-                            pimentón, bay leaves, garlic, tomatoes, onion, salt and pepper, and cook,
-                            stirring often until thickened and fragrant, about 10 minutes. Add
-                            saffron broth and remaining 4 1/2 cups chicken broth; bring to a boil.
-                        </Typography>
-                        <Typography paragraph>
-                            Add rice and stir very gently to distribute. Top with artichokes and
-                            peppers, and cook without stirring, until most of the liquid is absorbed,
-                            15 to 18 minutes. Reduce heat to medium-low, add reserved shrimp and
-                            mussels, tucking them down into the rice, and cook again without
-                            stirring, until mussels have opened and rice is just tender, 5 to 7
-                            minutes more. (Discard any mussels that don&apos;t open.)
-                        </Typography>
-                        <Typography>
-                            Set aside off of the heat to let rest for 10 minutes, and then serve.
-                        </Typography>
-
-                        <Link href="https://reactjs.org">
-                            Learn React
-                        </Link>
-                        <Link href="https://usedapp.io/">Learn useDapp</Link>
-                        <Link href="https://thegraph.com/docs/quick-start">Learn The Graph</Link>
-
-                    </CardContent>
-                </Collapse>
+                <Typography variant='h5'>
+                    {summary}
+                </Typography>
             </CardContent>
-            <CardActions disableSpacing>
-                <IconButton aria-label="add to favorites">
-                    <FavoriteIcon />
-                </IconButton>
-                <IconButton aria-label="share">
-                    <ShareIcon />
-                </IconButton>
-
-            </CardActions>
+            <Box margin={2}>
+                {assetType && <Chip label={assetType} />}
+            </Box>
 
         </Card>
     );

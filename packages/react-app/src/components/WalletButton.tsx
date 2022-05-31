@@ -39,7 +39,7 @@ function WalletButton() {
         }
     }, [error]);
 
-    const { data, error: apiError, loaded } = useRequest('api/register', {})
+
 
     return (
         <Button
