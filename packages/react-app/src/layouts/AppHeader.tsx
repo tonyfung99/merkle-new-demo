@@ -70,17 +70,17 @@ export default function AppHeader() {
                 <Button>
 
                 </Button>
-                <Tooltip title={('Profile ')} enterDelay={300}>
-                    <IconButton
-                        component="a"
-                        color="primary"
-                        href="/profile"
-                        data-ga-event-category="header"
-                        data-ga-event-action="github"
-                    >
-                        <AccountCircle fontSize="small" />
-                    </IconButton>
-                </Tooltip>
+
+                <IconButton
+                    component="a"
+                    color="primary"
+                    href="/profile"
+                    data-ga-event-category="header"
+                    data-ga-event-action="github"
+                >
+                    <AccountCircle fontSize="small" />
+                </IconButton>
+
                 {mode !== null ? (
                     <ThemeModeToggle
                         checked={mode === 'system' ? prefersDarkMode : mode === 'dark'}
@@ -88,9 +88,7 @@ export default function AppHeader() {
                     />
                 ) : null}
 
-                <Tooltip title={'Connect your wallet to write'} enterDelay={300}>
-                    <WalletButton />
-                </Tooltip>
+                <WalletButton />
 
 
             </Stack>

@@ -82,30 +82,6 @@ export const useGenerateKey = () => {
 const DEFAULT_LIST = ['0xd8da6bf26964af9d7eed9e03e53415d37aa96045',]
 
 
-export const useFeeds = (addresses: string[], tags?: Tag[]) => {
-
-  const [feeds, setFeeds] = useState<MediaNote[]>([])
-
-  React.useEffect(() => {
-
-    if (!addresses) {
-      return
-    }
-
-    const body = {
-      addresses: addresses.map(addr => buildLink(addr)),
-      tags: tags
-    }
-
-    const route = `https://pregod.rss3.dev/v0.4.0/notes`
-    axios.post(route, body).then(res => {
-      console.log(res.data)
-      setFeeds(res.data.list)
-    })
-  }, [addresses, tags])
-
-  return feeds
-}
 
 export const useProfileFeed = (address: string, tags?: Tag, exclude_tags?: string[]) => {
 

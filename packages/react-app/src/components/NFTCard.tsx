@@ -43,6 +43,7 @@ function NFTCard({ note }: { note: MediaNote }) {
 
     const nftMeta: NFTMeta = (note?.metadata as NFTMeta)
     const media_url = note?.attachments?.find(att => att.type === 'preview')?.address
+
     const isImage = ['jpg', 'png', 'gif', 'svg'].includes(media_url?.split('.')?.pop());
 
     console.log('media', note?.attachments?.find(att => att.type === 'preview'), media_url)

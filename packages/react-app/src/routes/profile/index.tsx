@@ -23,7 +23,7 @@ import CardContent from '@mui/material/CardContent';
 import Button from '@mui/material/Button';
 
 import Unidata from "unidata.js"
-import { addresses, abis } from "@merkle-news/contracts";
+
 import { shortenAddress, useCall, useEthers, useLookupAddress } from "@usedapp/core";
 import NFTCard from '../../components/NFTCard';
 
@@ -37,6 +37,7 @@ import Tab from '@mui/material/Tab';
 import TabContext from '@mui/lab/TabContext';
 import TabList from '@mui/lab/TabList';
 import TabPanel from '@mui/lab/TabPanel';
+import { parseLink } from '../../utils/schema';
 
 
 
@@ -92,37 +93,70 @@ const TimeLinePart = () => (<Timeline sx={{ width: 500 }}>
 
 </Timeline>)
 
+const UserHeader = ({ avatar, ens, account, feeds, nfts }) => {
 
+    return <Paper variant='outlined' sx={{ margin: 6 }}>
+        <Grid container spacing={1} justifyContent='space-between' padding={2}>
+
+            <Grid sx={{
+                display: 'flex',
+                flexDirection: 'row',
+                padding: 3,
+                alignItems: 'center',
+            }} item xs={12} md={8} >
+                <Avatar
+                    alt={ens || 'User'}
+                    src={avatar}
+                    sx={{ width: 120, height: 120, marginRight: 4 }}
+                />
+
+                <Stack direction={'column'} spacing={1} alignContent={'start'} alignItems='start'>
+
+                    <Typography variant="h3" color="text.secondary" align='center'>
+                        {ens}
+                    </Typography>
+                    <Typography variant="body2" color="text.secondary" align='center'>
+                        {account}
+                    </Typography>
+
+                    <Stack direction="row" spacing={1} alignItems={'center'}>
+                        <PermIdentityIcon />
+                        <Chip label="Collector" variant="outlined" />
+                        <Chip label="Author" variant="outlined" />
+                    </Stack>
+                    {/* <Stack direction="row" spacing={1} alignItems={'center'}>
+                <LanguageIcon />
+                {networks.map(n => <Chip label={n} />)}
+            </Stack> */}
+                </Stack>
+
+            </Grid>
+            <Grid item xs={12} md={4} sx={{
+                display: 'flex',
+                flexDirection: 'row'
+            }} >
+                <ContributionCard title='Articles' subTitle={feeds.length} />
+                <ContributionCard title='NFTs' subTitle={nfts.length} />
+            </Grid>
+
+        </Grid>
+
+    </Paper>
+}
 const Profile = (params: any) => {
 
     // todo:  remove assuming current use 
     const ens = useLookupAddress()
     const { account, activateBrowserWallet, deactivate, error, library } = useEthers();
 
-
-
     const avatar = useAvatar(account)
-
-
-
+    // const feeds = []
+    // const nfts = []
     const feeds = useProfileFeed(account, 'Mirror Entry') ?? []
-    const nfts = useProfileFeed(account, 'NFT') ?? []
+    const nfts = useProfileFeed(account, 'NFT')?.filter(feed => feed.metadata.to === parseLink(feed.authors[0]).identifier) ?? []
 
+    console.warn('Profile Rerendering')
 
-
-    const [networks, setNetworks] = React.useState([])
-
-    React.useEffect(() => {
-        const _networks = nfts.reduce((pre, cur, _, arr) => {
-            if (!pre.includes(cur.metadata.network)) {
-                pre.push(cur.metadata.network)
-                return pre
-            }
-            return pre
-        }, [])
-
-        setNetworks(_networks)
-    }, [nfts])
 
 
     const [tab, setTab] = React.useState('feed');
@@ -134,52 +168,8 @@ const Profile = (params: any) => {
     return (
         <Box>
             <Container>
-                <Paper variant='outlined' sx={{ margin: 6 }}>
-                    <Grid container spacing={1} justifyContent='space-between' padding={2}>
-                        <Grid sx={{
-                            display: 'flex',
-                            flexDirection: 'row',
-                            padding: 3,
-                            alignItems: 'center',
-                        }} item xs={12} md={8} spacing={2}>
-                            <Avatar
-                                alt={ens || 'User'}
-                                src={avatar}
-                                sx={{ width: 120, height: 120, marginRight: 4 }}
-                            />
+                <UserHeader avatar={avatar} ens={ens} account={account} feeds={feeds} nfts={nfts} />
 
-                            <Stack direction={'column'} spacing={1} alignContent={'start'} alignItems='start'>
-
-                                <Typography variant="h3" color="text.secondary" align='center'>
-                                    {ens}
-                                </Typography>
-                                <Typography variant="body2" color="text.secondary" align='center'>
-                                    {account}
-                                </Typography>
-
-                                <Stack direction="row" spacing={1} alignItems={'center'}>
-                                    <PermIdentityIcon />
-                                    <Chip label="Collector" variant="outlined" />
-                                    <Chip label="Author" variant="outlined" />
-                                </Stack>
-                                {/* <Stack direction="row" spacing={1} alignItems={'center'}>
-                                    <LanguageIcon />
-                                    {networks.map(n => <Chip label={n} />)}
-                                </Stack> */}
-                            </Stack>
-
-                        </Grid>
-                        <Grid item xs={12} md={4} sx={{
-                            display: 'flex',
-                            flexDirection: 'row'
-                        }} >
-
-                            <ContributionCard title='Articles' subTitle={feeds.length} />
-                            <ContributionCard title='NFTs' subTitle={nfts.length} />
-                        </Grid>
-                    </Grid>
-
-                </Paper>
 
                 <Stack direction={'column'} overflow='auto'>
 
@@ -206,8 +196,8 @@ const Profile = (params: any) => {
 
                             <Grid container spacing={1}>
 
-                                {nfts.map((n, idx) => <Grid item xs={12} sm={6} md={4}>
-                                    <NFTCard note={n} key={idx} />
+                                {nfts.map((n, idx) => <Grid item xs={12} sm={6} md={4} key={idx}>
+                                    <NFTCard note={n} />
                                 </Grid>
                                 )}
                             </Grid>

@@ -69,7 +69,7 @@ function PostCard({ feed }: { feed: MediaNote }) {
     // const meta = feed?.metadata?.
     const tag = feed?.tags?.[0]
 
-    const network = tag.split('.')?.[0]
+    const network = feed?.metadata?.network
     const assetType = tag
 
     // const summary = feed?.summary || `I have ${feed?.target?.action?.type}ed a ${assetType} on ${network}`
@@ -77,9 +77,14 @@ function PostCard({ feed }: { feed: MediaNote }) {
     const isNFT = tag.includes('NFT')
     const isArticle = tag.includes('Mirror Entry')
 
+    const { identifier: userAddr } = parseLink(feed.authors?.[0]) || {}
+
+
     let summary = feed?.summary
-    // if (isNFT) {
-    //     summary = (feed?.metadata as NFTMeta).collection_name
+    if (isNFT) {
+        const nftMeta = (feed?.metadata as NFTMeta)
+        summary = `I have ${nftMeta.to == userAddr ? 'received' : 'sent'} an NFT, take a look:`
+    }
     // } else if (isArticle) {
     //     summary = (feed as ArticleNote).summary
     // }
@@ -88,7 +93,7 @@ function PostCard({ feed }: { feed: MediaNote }) {
     const { library } = useEthers();
 
 
-    const { identifier: userAddr } = parseLink(feed.authors?.[0]) || {}
+
 
     const avatar = null
     const [displayName, setDisplayName] = React.useState(userAddr)
@@ -124,12 +129,14 @@ function PostCard({ feed }: { feed: MediaNote }) {
                 {isArticle ?
                     (<ReactMarkdown>
                         {summary}
-                    </ReactMarkdown>) :
-                    <Typography variant='body1'>
-                        {summary}
+                    </ReactMarkdown>) : <Box>
 
+                        <Typography variant='body1'>
+                            {summary}
+
+                        </Typography>
                         <NFTCard note={feed} />
-                    </Typography>
+                    </Box>
                 }
 
             </CardContent>

@@ -69,6 +69,8 @@ const Feeds = (params: any) => {
         setValueOfInput('')
     }
 
+    console.warn('Feed Rerendering')
+
     const [filterOption, setFilterOption] = React.useState<'all' | 'Mirror Entry' | 'NFT'>('all');
 
     const [feeds, setFeeds] = React.useState<MediaNote[]>([])
