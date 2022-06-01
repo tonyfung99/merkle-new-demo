@@ -153,7 +153,7 @@ const Profile = (params: any) => {
     // const feeds = []
     // const nfts = []
     const feeds = useProfileFeed(account, 'Mirror Entry') ?? []
-    const nfts = useProfileFeed(account, 'NFT')?.filter(feed => feed.metadata.to === parseLink(feed.authors[0]).identifier) ?? []
+    const nfts = useProfileFeed(account, 'NFT')?.filter(feed => feed.metadata.to === parseLink(feed.authors[0]).identifier && feed.attachments) ?? []
 
     console.warn('Profile Rerendering')
 

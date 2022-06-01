@@ -18,6 +18,9 @@ import { Box, Chip, Paper } from '@mui/material';
 
 import { CardActionArea } from '@mui/material';
 import { MediaNote, NFTMeta, MIMEContent } from '../utils/schema';
+
+import { useNavigate } from '@reach/router';
+
 interface ExpandMoreProps extends IconButtonProps {
     expand: boolean;
 }
@@ -36,7 +39,7 @@ const ExpandMore = styled((props: ExpandMoreProps) => {
 
 function NFTCard({ note }: { note: MediaNote }) {
     const [expanded, setExpanded] = React.useState(false);
-
+    const navigate = useNavigate();
     const handleExpandClick = () => {
         setExpanded(!expanded);
     };
@@ -55,6 +58,8 @@ function NFTCard({ note }: { note: MediaNote }) {
                 flexDirection: 'column',
                 alignContent: 'flex-start',
                 alignItems: 'start'
+            }} onClick={() => {
+                navigate(note.related_urls.pop())
             }}>
                 {media_url ?
                     <CardMedia

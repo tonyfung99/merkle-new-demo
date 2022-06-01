@@ -22,6 +22,9 @@ import { MediaNote, NFTMeta, parseLink } from '../utils/schema';
 import ReactMarkdown from 'react-markdown'
 import NFTCard from './NFTCard';
 
+import { CardActionArea } from '@mui/material';
+import { useNavigate } from '@reach/router';
+
 interface FeedTargetAction {
     type: 'update' | 'add'
     payload: string
@@ -81,19 +84,21 @@ function PostCard({ feed }: { feed: MediaNote }) {
 
 
     let summary = feed?.summary
-    if (isNFT) {
-        const nftMeta = (feed?.metadata as NFTMeta)
-        summary = `I have ${nftMeta.to == userAddr ? 'received' : 'sent'} an NFT, take a look:`
-    }
+
     // } else if (isArticle) {
     //     summary = (feed as ArticleNote).summary
     // }
 
     let title = feed?.title || ''
+
+    if (isNFT) {
+        const nftMeta = (feed?.metadata as NFTMeta)
+        summary = `I have ${nftMeta.to == userAddr ? 'received' : 'sent'} an NFT from ${nftMeta.from}`
+        title = ''
+    }
+
     const { library } = useEthers();
-
-
-
+    const navigate = useNavigate();
 
     const avatar = null
     const [displayName, setDisplayName] = React.useState(userAddr)
@@ -120,26 +125,30 @@ function PostCard({ feed }: { feed: MediaNote }) {
                 title={displayName}
                 subheader={feed.date_updated}
             />
+            <CardActionArea onClick={() => {
+                navigate(feed.related_urls.pop())
+            }}>
 
-            <CardContent>
+                <CardContent>
 
-                <Typography variant='h3'>
-                    {title}
-                </Typography>
-                {isArticle ?
-                    (<ReactMarkdown>
-                        {summary}
-                    </ReactMarkdown>) : <Box>
-
-                        <Typography variant='body1'>
+                    <Typography variant='h3'>
+                        {title}
+                    </Typography>
+                    {isArticle ?
+                        (<ReactMarkdown>
                             {summary}
+                        </ReactMarkdown>) : <Box>
 
-                        </Typography>
-                        <NFTCard note={feed} />
-                    </Box>
-                }
+                            <Typography variant='body1'>
+                                {summary}
 
-            </CardContent>
+                            </Typography>
+                            <NFTCard note={feed} />
+                        </Box>
+                    }
+
+                </CardContent>
+            </CardActionArea>
             <Box margin={2}>
                 {assetType && <Chip label={assetType} />}
             </Box>
